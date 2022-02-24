@@ -37,7 +37,7 @@ fn get_status(server_name: &str) -> Result<Status, Error> {
         Selector::parse(".ags-ServerStatus-content-responses-response-server").unwrap();
     let server_wrapper = document
         .select(&server_wrappers_selector)
-        .find(|w| w.text().any(|t| t.contains(&server_name)))
+        .find(|w| w.text().any(|t| t.trim().eq(server_name)))
         .ok_or_else(|| anyhow!("missing server wrapper for selected server"))?;
 
     let server_status_wrapper_selector =
