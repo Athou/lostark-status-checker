@@ -76,16 +76,23 @@ fn main() {
     let args = Args::parse();
 
     loop {
-        let status = get_status(&args.server_name).unwrap();
+        let status = get_status(&args.server_name);
         match status {
-            Status::Maintenance => {
+            Err(e) => {
+                println!(
+                    "{} status is unknown, checking again in {}s ({})",
+                    args.server_name, args.interval, e
+                );
+                thread::sleep(time::Duration::from_secs(args.interval));
+            }
+            Ok(Status::Maintenance) => {
                 println!(
                     "{} is down for maintenance, checking again in {}s",
                     args.server_name, args.interval
                 );
                 thread::sleep(time::Duration::from_secs(args.interval));
             }
-            other => {
+            Ok(other) => {
                 println!("{} is up (status: {:?})", args.server_name, &other);
                 notify(&args.server_name, &other).unwrap();
                 break;
